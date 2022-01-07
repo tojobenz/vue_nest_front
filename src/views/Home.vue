@@ -59,13 +59,13 @@
                   </router-link>
                   <button
                     class="btn btn-sm btn-outline-secondary"
-                    v-on:click="deleteCustomer(customer._id)"
+                    @click="openModal('delete', customer._id)"
                   >
                     Delete Customer
                   </button>
                   <button
                     class="btn btn-sm btn-outline-secondary"
-                    v-on:click="duplicateCustomer(customer)"
+                    @click="openModal('duplicate', customer)"
                   >
                     Duplicate
                   </button>
@@ -96,17 +96,18 @@
         </ul>
       </nav>
     </div>
+    <Modal v-show="visible" @close="close" :title="title" :type="typeModal" @validate="validate" />
     <!-- </div> -->
   </div>
 </template>
 
 <script>
-import { server } from "../helper";
-import axios from "axios";
 import CustomerService from "../services/customer.service";
 import { mapState, mapMutations } from "vuex";
-import { PaginationCustom } from "../fonctions/pagination";
+import { router} from '../router.js';
+import  Modal from '../components/CustomComponent/modal.vue'
 export default {
+   components: {Modal},
   data() {
     return {
       customers: [],
@@ -115,6 +116,9 @@ export default {
       isActive: 1,
       limit: "",
       selectedItem: 2,
+      visible: false,
+      title: "",
+      typeModal: ""
     };
   },
   computed: {
@@ -167,14 +171,16 @@ export default {
       );
     },
     duplicateCustomer(data) {
-          CustomerService.createCustomer(data)
+      delete data._id, delete data.__v, delete data.created_at
+      console.log(data);
+           CustomerService.createCustomer(data)
         .then(response => {
           console.log(response)
-           router.push({ name: "home" });
+           router.push('/home');
         })
         .catch(e => {
           console.log(e);
-        });
+        }); 
 
     },
     numberPage(a, index) {
@@ -272,7 +278,27 @@ export default {
           }
         );
       }
-    }
+    },
+      openModal(type, value) {
+      this.visible = true;
+      this.typeModal = {type, value}
+    },
+    close() {
+      this.visible = false;
+    },
+        validate(v) {
+          console.log(v);
+          switch(v.type) {
+            case 'duplicate':
+              this.duplicateCustomer(v.value)
+              break;
+            case 'delete':
+              this.deleteCustomer(v.value)
+            default: 
+              console.log('default');
+          }
+      this.visible = false;
+    },
   }
 };
 </script>

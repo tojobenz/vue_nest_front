@@ -25,6 +25,7 @@ import {
   TTextarea,
   TSelect,
   TButton,
+  TModal,
 } from 'vue-tailwind/dist/components';
 import "tailwindcss/tailwind.css"
 Vue.use(VeeValidate);
@@ -45,6 +46,9 @@ const components = {
   't-button': {
     component: TButton,
   },
+  't-modal': {
+    component: TModal
+  }
 }
 
 
