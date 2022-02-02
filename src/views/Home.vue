@@ -48,7 +48,7 @@
             <td>{{ customer.email }}</td>
             <td>{{ regex(customer.phone) }}</td>
             <td>{{ customer.address }}</td>
-            <td>{{ customer.description }}</td>
+            <td>{{  trunc(customer.description) }}</td>
             <td>
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group" style="margin-bottom: 20px;">
@@ -78,7 +78,7 @@
       <nav aria-label="Page navigation example">
         <ul class="pagination">
           <li class="page-item">
-            <a class="page-link" @click="prevPage()">Previous</a>
+            <button type="button" class="page-link" @click="prevPage()" :disabled="prevActive">Previous</button>
           </li>
           <li
             class="page-item"
@@ -86,12 +86,12 @@
             v-bind:class="{ active: isActive === index }"
             v-bind:key="page"
           >
-            <a class="page-link" @click="numberPage(page, index)">{{
+            <button class="page-link" @click="numberPage(page, index)" >{{
               index
-            }}</a>
+            }}</button>
           </li>
           <li class="page-item">
-            <a class="page-link" @click="nextPage()">Next</a>
+            <button class="page-link" @click="nextPage()" :disabled="nextActive">Next</button>
           </li>
         </ul>
       </nav>
@@ -106,6 +106,7 @@ import CustomerService from "../services/customer.service";
 import { mapState, mapMutations } from "vuex";
 import { router} from '../router.js';
 import  Modal from '../components/CustomComponent/modal.vue'
+import Truncate from '../helper/truncate'
 export default {
    components: {Modal},
   data() {
@@ -118,7 +119,9 @@ export default {
       selectedItem: 2,
       visible: false,
       title: "",
-      typeModal: ""
+      typeModal: "",
+      prevActive: true,
+      nextActive: false
     };
   },
   computed: {
@@ -140,13 +143,16 @@ export default {
       let phone = int.replace(/(\d{3})(\d{2})(\d{3})(\d{2})/, "$1 $2 $3 $4");
       return phone;
     },
+    trunc(input) {
+      return Truncate(input, 100)
+    },
     fetchCustomers() {
       CustomerService.getAllCustomers().then(
         response => {
           this.customers = response.data.results;
           this.pagination = response.data.totalPages;
           this.current = response.data.currentPage;
-          console.log(this.current);
+          let input = this.customers[1].description;
         },
         error => {
           localStorage.removeItem("user");
@@ -194,6 +200,21 @@ export default {
           this.customers = response.data.results;
           this.pagination = response.data.totalPages;
           this.isActive = index;
+          this.current = index
+          if(index == this.pagination){
+              this.nextActive = true;
+              this.prevActive = false;
+            } else if(index!= 1) {
+              this.prevActive = false
+              this.nextActive = false;
+            } else if (index == 1) {
+              this.prevActive = true;
+              this.nextActive = false
+              } else if (index != this.pagination) {
+                this.nextActive =false
+              } else {
+              this.nextActive = false
+            }
         },
         error => {
           localStorage.removeItem("user");
@@ -218,7 +239,13 @@ export default {
             this.customers = response.data.results;
             this.pagination = response.data.totalPages;
             this.current = response.data.currentPage;
-            console.log(response.data);
+            if(index == this.pagination){
+              this.nextActive = true;
+            } else if(index!= 1) {
+              this.prevActive = false
+            } else {
+              this.nextActive = false
+            }
           },
           error => {
             localStorage.removeItem("user");
@@ -244,7 +271,12 @@ export default {
             this.customers = response.data.results;
             this.pagination = response.data.totalPages;
             this.current = response.data.currentPage;
-            console.log(response.data);
+            if(index == 1){
+              this.prevActive = true;
+              this.nextActive = false;
+            } else {
+              this.prevActive = false
+            }
           },
           error => {
             localStorage.removeItem("user");

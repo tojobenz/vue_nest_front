@@ -38,7 +38,7 @@
             </h3>
           </div>
           <div class="mt-2">
-            Do you want to {{type.type}} this element?
+            Do you want to  this element?
           </div>
         </div>
       </div>
@@ -64,7 +64,8 @@ export default {
       this.$emit('close', true)
     },
         validate() {
-      this.$emit('validate', type)
+          console.log(this.type);
+      this.$emit('validate', this.type)
     },
   },
 };

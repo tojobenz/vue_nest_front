@@ -36,7 +36,7 @@
 
               <div class="form-group col-md-12">
                   <label for="description"> Description </label>
-                  <input type="text" id="description" v-model="customer.description" name="description" class="form-control" placeholder="Enter Description">
+                  <textarea name="description" id="description" v-model="customer.description" class="form-control" placeholder="Enter Description" cols="30" rows="10"></textarea>
               </div>
 
               <div class="form-group col-md-4 pull-right">
@@ -48,8 +48,6 @@
 </template>
 
 <script>
-import { server } from "../../helper";
-import axios from "axios";
 import router from "../../router";
 import CustomerService from '../../services/customer.service';
 export default {
